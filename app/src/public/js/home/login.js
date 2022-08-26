@@ -20,6 +20,15 @@ function login() {
         body : JSON.stringify(req)
     })
     .then((res) => res.json())
-    .then((res) => console.log(res));
+    .then((res) => {
+        if (res.success){
+            location.href = "/";    // 로그인에 성공하면 홈화면으로 이동
+        } else {
+            alert(res.msg);
+        }
+    })
+    .catch((err) => {       // 에러 처리
+        console.error(new Error("로그인 중 에러 발생"));
+    }); //new Error 굳이 안 써도 됨. 쓰면 'Error :' 표시가 추가됨
 }
 
