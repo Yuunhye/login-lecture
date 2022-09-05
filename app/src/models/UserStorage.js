@@ -18,6 +18,18 @@ class UserStorage {
         }, {});
         return newUsers;
     }
+
+    static getUserInfo(id) {        //id를 넣어주면 그 id에 해당하는 password, name까지 포함한 object를 반환하는 method.
+        const users = this.#users;
+        const idx = users.id.indexOf(id);
+        const usersKeys = Object.keys(users);   //users의 key값들로 배열을 만듦. => [id, password, name]
+        const userInfo = usersKeys.reduce((newUser, info) => {
+            newUser[info] = users[info][idx];
+            return newUser;
+        }, {});
+
+        return userInfo;
+    }
 }
 
 module.exports = UserStorage;   //외부에서 UserStorage를 사용하기 위함.
