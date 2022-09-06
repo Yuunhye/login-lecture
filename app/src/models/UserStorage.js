@@ -30,6 +30,14 @@ class UserStorage {
 
         return userInfo;
     }
+
+    static save(userInfo) {
+        const users = this.#users;
+        users.id.push(userInfo.id);
+        users.name.push(userInfo.name);
+        users.password.push(userInfo.password);
+        return {success : true};
+    }
 }
 
 module.exports = UserStorage;   //외부에서 UserStorage를 사용하기 위함.
