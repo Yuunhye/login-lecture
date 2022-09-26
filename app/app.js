@@ -3,6 +3,9 @@
 // 모듈
 const express = require('express');
 const bodyParser = require("body-parser"); // body를 보기 위한 모듈. body-parser를 사용할 때 미들웨어를 등록해줘야함.
+const dotenv = require("dotenv");
+dotenv.config();
+
 const app = express();
 
 // 라우팅

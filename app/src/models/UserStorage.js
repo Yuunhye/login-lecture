@@ -1,59 +1,47 @@
 "use strict";
 
-const fs = require("fs").promises;
+const db = require("../config/db.js");
+
 
 //파일명과 같은 이름으로 해주는게 좋음
 class UserStorage {
-    
-    static #getUserInfo(data,id) {     //은닉화된 method
-        const users = JSON.parse(data);
-        const idx = users.id.indexOf(id);
-        const usersKeys = Object.keys(users);   //users의 key값들로 배열을 만듦. => [id, password, name]
-        const userInfo = usersKeys.reduce((newUser, info) => {
-            newUser[info] = users[info][idx];
-            return newUser;
-        }, {});
-        return userInfo;
-    }
-
-    static #getUsers(data, isAll, fields) {
-        const users = JSON.parse(data);
-        if(isAll) return users;
-        const newUsers = fields.reduce((newUsers, field) => {
-            if(users.hasOwnProperty(field)){    //users에 field에 해당하는 key값이 존재하냐
-                newUsers[field] = users[field];
-            }
-            return newUsers;
-        }, {});
-        return newUsers;
-    }
-
-    static getUsers(isAll, ...fields) {
-        return fs.readFile("./src/databases/users.json")
-        .then((data) => {
-            return this.#getUsers(data, isAll, fields);
+    static getUsers( ...fields) {
+        return new Promise((resolve, reject)=> {
+            db.query("SELECT * FROM users", (err, data) => {
+                if(err) reject(err);
+                const newUsers = fields.reduce((newUsers, field) => { 
+                    var arr = [];
+                    if(data[0].hasOwnProperty(field)){
+                        for (var i=0; i<data.length; i++) {
+                            arr[i] = data[i][field];
+                        }
+                        newUsers[field] = arr;
+                    }
+                    return newUsers;
+                },{});
+                resolve(newUsers);
+            })
         })
-        .catch(console.error);
     }
 
     static getUserInfo(id) {        //id를 넣어주면 그 id에 해당하는 password, name까지 포함한 object를 반환하는 method.
-        return fs.readFile("./src/databases/users.json")
-        .then((data) => {   //readFile이 성공적으로 수행되면 실행
-            return this.#getUserInfo(data,id)
+        return new Promise((resolve, reject) => {
+            const query = "SELECT * FROM users WHERE id = ?";
+            db.query(query,[id], (err, data) =>{
+                if(err) reject(`${err}`);
+                resolve( data[0]);
+            });
         })
-        .catch(console.error);     // (err) => console.error(err)
     }
 
-    static async save(userInfo) {
-        const users = await this.getUsers(true) 
-        if(users.id.includes(userInfo.id)) {
-            throw "이미 존재하는 아이디입니다."
-        }
-        users.id.push(userInfo.id);
-        users.password.push(userInfo.password);
-        users.name.push(userInfo.name);
-        fs.writeFile("./src/databases/users.json", JSON.stringify(users));
-        return {success : true};
+    static save(userInfo) {
+        return new Promise ((resolve, reject) => {
+            const query = "INSERT INTO users(id, name, password) values (?,?,?)";
+            db.query(query,[userInfo.id,userInfo.name,userInfo.password],(err)=>{
+                if(err) reject(err);
+                resolve({success : true});
+            } )
+        })
     }
 }
 
