@@ -10,7 +10,7 @@ class User {
     async login() {
         const client = this.body;
         try{
-            const {id, password} = await UserStorage.getUserInfo(client.id);
+            const {id, password} = await UserStorage.getUserInfo(client.id) || {};
 
             if (id) {   //id가 존재하는지부터 확인
                 if (password === client.password) {
@@ -20,7 +20,7 @@ class User {
             }
             return {success : false, msg : "존재하지 않는 아이디입니다."};
         } catch (err){
-            return {success : false, msg : err};
+            return {success : false, err}; //key : value 동일하면 key만 입력해도 됨. == err : err
         }
     }
 
@@ -34,7 +34,7 @@ class User {
                 err = "이미 존재하는 아이디입니다.";
             }
             else err = `${err.code}`;
-            return {success : false, msg : err}
+            return {success : false, err}
         }
     }
 }

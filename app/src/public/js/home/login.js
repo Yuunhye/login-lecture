@@ -7,6 +7,8 @@ const id = document.querySelector("#id"),
 loginBtn.addEventListener("click", login);
 
 function login() {
+    if (!id.value) return alert("아이디를 입력해주십시오. ");
+    if (!password.value) return alert("비밀번호를 입력해주십시오. ");
     const req = {
         id : id.value,
         password : password.value
@@ -24,6 +26,7 @@ function login() {
         if (res.success){
             location.href = "/";    // 로그인에 성공하면 홈화면으로 이동
         } else {
+            if (res.err) return alert(res.err);  //실제로는 이렇게 에러를 직접적으로 띄우면 안됨.
             alert(res.msg);
         }
     })

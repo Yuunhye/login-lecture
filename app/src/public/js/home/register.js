@@ -33,6 +33,7 @@ function register() {
         if (res.success){
             location.href = "/login";
         } else {
+            if (res.err) return alert(res.err);  //실제로는 이렇게 에러를 직접적으로 띄우면 안됨.
             alert(res.msg);
         }
     })
